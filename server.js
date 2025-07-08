@@ -1,31 +1,33 @@
-const cors = require('cors');
 const express = require('express');
 const nodemailer = require('nodemailer');
 const dotenv = require('dotenv');
 const path = require('path');
+const cors = require('cors'); // ← NEU: cors importieren
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve frontend files
+app.use(cors()); // ← NEU: CORS aktivieren, GANZ OBEN nach app-Initialisierung
+
+// Serve frontend files (optional, wenn du frontend mitservierst)
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Configure email transporter
+// Email transporter konfigurieren
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
-  secure: false, // Use TLS on port 587
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
   }
 });
 
-// Contact form route
+// Kontaktformular-Route
 app.post('/contact', async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -44,7 +46,7 @@ app.post('/contact', async (req, res) => {
   }
 });
 
-// Start the server
+// Server starten
 app.listen(PORT, () => {
   console.log(`✅ Server läuft auf http://localhost:${PORT}`);
 });
